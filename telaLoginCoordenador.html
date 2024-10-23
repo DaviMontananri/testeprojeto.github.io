@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela de login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="loginCoord.css">
+
+</head>
+<!-- bg-secondary bg-gradient-15 bg-opacity-50 -->
+
+<body>
+   
+    <div class="position-absolute top-0 start-50 translate-middle-x mt-5">
+        <p id="texto"></p>
+
+    </div>
+
+    <!-- Aqui estou criando os inputs e label para que o usuario preencha o formulario certinho -->
+    <div class="page">
+        <form class="loginCoord" name="Formlogin" onsubmit="return false;">
+            <h1>Login</h1>
+            <p>Digite os seus dados de acesso nos campos abaixo.</p>
+
+                <!-- input email -->
+                <label for="emailLogin">Email</label>
+                <input type="email" name="emailLogin" id="emailLogin" placeholder="Digite seu e-mail" autofocus="true" required>
+            
+
+                <!-- input senha e Alterar senha -->
+                <label for="senhaLogin">Senha</label>
+                <input type="password" name="senhaLogin" id="senhaLogin" placeholder="Digite sua senha" required>
+                <a href="http://127.0.0.1:5502/frontend/esqueciSenha.html">Alterar senha</a>
+
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-secondary me-2 mt-2" onclick="CadastrarCoord()">Cadastrar</button>
+                <button type="submit" class="btn btn-secondary me-2 mt-2" id="btnEntrar">Entrar</button>
+            </div>
+        <div id="message" class="text-center mt-3"></div>
+        </form>
+    </div>
+    
+
+    <!-- Aqui estou chamando o script para dar funcionalidades ao sistema -->
+    <script>
+        //Aqui estou o botao pelo id dele e adicionando a funcao click com async e await 
+        document.getElementById('btnEntrar').addEventListener('click', async function () {
+
+            const email = document.getElementById('emailLogin').value;
+            const senha = document.getElementById('senhaLogin').value;
+
+            try {
+                //Aqui criei uma const que chama o await que e uma espera antes de retornar uma promise
+                const response = await axios.post('http://localhost:3000/validacao-login', { emailLogin: email, senhaLogin: senha });
+
+                //Aqui e um if que  verifica se a resposta do servidor foi bem sucedida e
+                //entra na tela do coordenador que fez login
+                //localstorage.setItem - ele armazena algo 
+                //Token - autenticação por token para verificar a identidade de um usuário, uma API, um computador ou outro servidor.
+                if (response.data.valid) {
+                    // Supondo que o nome do usuário esteja na resposta do servidor
+                    const nomeCoordenador = response.data.nome; // Criei uma const para ficar armazendos os nome que tem login
+                    localStorage.setItem('authToken', 'seuToken'); //Aqui esta armazenando um token
+                    localStorage.setItem('nomeCoordenador', nomeCoordenador); // Armazenar o nome do usuario cadastrado
+                    alert(`Bem vindo, ${nomeCoordenador}`); // Mostrara quando o fizer o login
+                    window.location.href = 'http://127.0.0.1:5502/frontend/TelaAnexo.html'// Vai para a proxima tela apos o login
+
+                } else {
+                    // Mostrara se o email ou senha estao incorretos
+                    document.getElementById('message').innerText = 'Email ou senha incorretos.';
+                    document.getElementById('message').style.background = '#67735C';
+                    document.getElementById('message').style.color = 'red';
+                }
+            } catch (error) {
+                //Aqui e caso der erro com o servidor
+                document.getElementById('message').innerText = 'Erro ao conectar ao servidor.';
+            }
+        });
+
+        //Funcao caso o coordenador nao tenha nenhuma conta criada ai entao ele vai poder cadastrar
+        function CadastrarCoord() {
+            window.location = 'http://127.0.0.1:5502/frontend/CadastroCoordenador.html';
+        }
+
+
+
+    </script>
+</body>
+
+</html>
